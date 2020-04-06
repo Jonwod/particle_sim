@@ -2,6 +2,8 @@ extern crate sfml;
 
 mod ball;
 mod world;
+mod geometry;
+mod vector_math;
 
 use sfml::window::{ContextSettings, VideoMode, event, window_style};
 use sfml::graphics::{RenderWindow, RenderTarget, Color};
@@ -34,7 +36,6 @@ fn main() {
 
         // Display things on screen
         window.display();
-
 
         world.update(dt);
     }
