@@ -19,7 +19,7 @@ impl World {
         world.balls[0].velocity.x = 100.0;
         world.balls[1].circle.position.x = 600.0;
         world.balls[1].velocity.x = 0.0;
-        world.balls[1].set_mass(2.0);
+        world.balls[1].set_mass(1.0);
         for ball in &mut world.balls {
             ball.circle.position.y = 200.0;
         }
@@ -92,4 +92,10 @@ impl World {
         rect.set_fill_color(&Color::new_rgb(100, 100, 100));
         window.draw(&rect);
     }
+
+
+    pub fn get_balls(&self) -> &[Ball; 2] {
+        &self.balls
+    }
+
 }
