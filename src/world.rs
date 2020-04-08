@@ -1,7 +1,6 @@
 use super::ball::Ball;
 use sfml::system::Vector2f;
 use sfml::graphics::{RenderWindow, RectangleShape, Transformable, Shape, Color, RenderTarget};
-use crate::geometry::Circle;
 
 static G: f32 = 0.0;
 
@@ -18,7 +17,7 @@ impl World {
         world.balls[0].circle.position.x = 100.0;
         world.balls[0].velocity.x = 100.0;
         world.balls[1].circle.position.x = 600.0;
-        world.balls[1].velocity.x = -200.0;
+        world.balls[1].velocity.x = -10.0;
         world.balls[1].set_mass(1.0);
         for ball in &mut world.balls {
             ball.circle.position.y = 200.0;
@@ -27,28 +26,27 @@ impl World {
     }
 
 
-    pub fn update(&mut self, dt: f32) {
+    pub fn update(&mut self, mut dt: f32) {
         for ball in &mut self.balls {
             ball.velocity.y += G * dt;
         }
 
-        let mut projected_circles: Vec<Circle> = self.balls.iter().map(|b| Circle{position: b.circle.position + b.velocity*dt, radius: b.circle.radius}).collect();
-
-        for i in 0..projected_circles.len() {
-            for j in (i+1)..projected_circles.len() {
-                if projected_circles[i].intersect(&projected_circles[j]) {
-                    let (vi, vj) = Ball::resolve_collision(& self.balls[i], & self.balls[j]);
-                    self.balls[i].velocity = vi;
-                    self.balls[j].velocity = vj;
-                    projected_circles[i].position = self.balls[i].circle.position + self.balls[i].velocity * dt;
-                    projected_circles[j].position = self.balls[j].circle.position + self.balls[j].velocity * dt
+        match Ball::collision_time(&self.balls[0], &self.balls[1]) {
+            Some(dt1) => {
+                if dt1 < dt {
+                    self.balls[0].circle.position = self.balls[0].circle.position + self.balls[0].velocity * dt1;
+                    self.balls[1].circle.position = self.balls[1].circle.position + self.balls[1].velocity * dt1;
+                    let (v0, v1) = Ball::resolve_collision(&self.balls[0], &self.balls[1]);
+                    self.balls[0].velocity = v0;
+                    self.balls[1].velocity = v1;
+                    dt -= dt1;
                 }
-            }
+            },
+            None => { }
         }
 
-        for i in 0..projected_circles.len() {
-            self.balls[i].circle.position = projected_circles[i].position;
-        }
+        self.balls[0].circle.position = self.balls[0].circle.position + self.balls[0].velocity * dt;
+        self.balls[1].circle.position = self.balls[1].circle.position + self.balls[1].velocity * dt;
 
 
         //for ball in &mut self.balls {
@@ -97,5 +95,4 @@ impl World {
     pub fn get_balls(&self) -> &[Ball; 2] {
         &self.balls
     }
-
 }

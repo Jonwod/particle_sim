@@ -2,6 +2,7 @@ use sfml::graphics::{RenderWindow, RenderTarget, Text, Font, Transformable};
 use super::world::World;
 use sfml::system::Vector2f;
 use super::slider::Slider;
+use super::ball::Ball;
 
 pub struct Interface {
     font: Font,
@@ -41,7 +42,20 @@ impl Interface {
         t.set_position(&Vector2f{x: 0.0, y: 40.0});
         window.draw(&t);
 
+
         self.time_slider.draw(window);
+
+        let collision_message = match Ball::collision_time(&world.get_balls()[0], &world.get_balls()[1]) {
+            Some(dt) => {
+                format!("{:.2}", dt)
+            },
+            None => {
+                String::from("never")
+            }
+        };
+        t.set_string(&format!("time to collision: {}", collision_message));
+        t.set_position(&Vector2f{x: 0.0, y: 400.0});
+        window.draw(&t);
     }
 
 
