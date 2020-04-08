@@ -9,7 +9,6 @@ mod interface;
 mod slider;
 
 use sfml::window::{ContextSettings, VideoMode, event, window_style};
-use sfml::window::event::Event;
 use sfml::graphics::{RenderWindow, RenderTarget, Color};
 use world::World;
 use interface::Interface;
@@ -32,9 +31,9 @@ fn main() {
         for event in window.events() {
             match event {
                 event::Closed => window.close(),
-                event::MouseButtonPressed{button, x, y}  => interface.notify_mouse_down(x, y),
-                event::MouseButtonReleased{button, x, y} => interface.notify_mouse_up(x, y),
-                event::MouseMoved{x, y}                              => interface.notify_mouse_moved(x, y),
+                event::MouseButtonPressed{button: _, x, y}  => interface.notify_mouse_down(x, y),
+                event::MouseButtonReleased{button: _, x, y} => interface.notify_mouse_up(x, y),
+                event::MouseMoved{x, y}                     => interface.notify_mouse_moved(x, y),
                 _             => {/* do nothing */}
             }
         }

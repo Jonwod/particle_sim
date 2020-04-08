@@ -18,7 +18,7 @@ impl World {
         world.balls[0].circle.position.x = 100.0;
         world.balls[0].velocity.x = 100.0;
         world.balls[1].circle.position.x = 600.0;
-        world.balls[1].velocity.x = 0.0;
+        world.balls[1].velocity.x = -200.0;
         world.balls[1].set_mass(1.0);
         for ball in &mut world.balls {
             ball.circle.position.y = 200.0;
