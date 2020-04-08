@@ -7,6 +7,7 @@ mod geometry;
 mod vector_math;
 mod interface;
 mod slider;
+mod math;
 
 use sfml::window::{ContextSettings, VideoMode, event, window_style};
 use sfml::graphics::{RenderWindow, RenderTarget, Color};
@@ -15,6 +16,9 @@ use interface::Interface;
 
 
 fn main() {
+    let (root1, root2) = math::find_roots(1.0, -2.0, 1.0).unwrap();
+    println!("Roots: {}, {}", root1, root2);
+
     // Create the window of the application
     let mut window = RenderWindow::new(VideoMode::new_init(800, 600, 32),
                                              "SFML Example", window_style::CLOSE,
