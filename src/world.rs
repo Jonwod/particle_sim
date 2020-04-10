@@ -1,4 +1,5 @@
 use super::ball::Ball;
+use super::geometry::Circle;
 use sfml::system::Vector2f;
 use sfml::graphics::{RenderWindow, RectangleShape, Transformable, Shape, Color, RenderTarget};
 
@@ -14,14 +15,14 @@ pub struct World {
 impl World {
     pub fn new() -> World {
         let mut world = World{ balls: [Ball::default(); 2], floor_level: 500.0};
-        world.balls[0].circle.position.x = 100.0;
+        world.balls[0].circle.position.x = 200.0;
+        world.balls[0].circle.position.y = 400.0;
         world.balls[0].velocity.x = 100.0;
-        world.balls[1].circle.position.x = 600.0;
-        world.balls[1].velocity.x = -10.0;
+        world.balls[0].velocity.y = 0.0;
+        world.balls[1].circle.position.x = 400.0;
+        world.balls[1].circle.position.y = 340.0;
+        world.balls[1].velocity.x = 0.0;
         world.balls[1].set_mass(1.0);
-        for ball in &mut world.balls {
-            ball.circle.position.y = 200.0;
-        }
         world
     }
 
@@ -31,22 +32,34 @@ impl World {
             ball.velocity.y += G * dt;
         }
 
-        match Ball::collision_time(&self.balls[0], &self.balls[1]) {
-            Some(dt1) => {
-                if dt1 < dt {
-                    self.balls[0].circle.position = self.balls[0].circle.position + self.balls[0].velocity * dt1;
-                    self.balls[1].circle.position = self.balls[1].circle.position + self.balls[1].velocity * dt1;
-                    let (v0, v1) = Ball::resolve_collision(&self.balls[0], &self.balls[1]);
-                    self.balls[0].velocity = v0;
-                    self.balls[1].velocity = v1;
-                    dt -= dt1;
-                }
-            },
-            None => { }
+        // Test method:
+        if Circle::intersect(&self.balls[0].circle, &self.balls[1].circle) {
+            let (v0, v1) = Ball::resolve_collision(&self.balls[0], &self.balls[1]);
+            self.balls[0].velocity = v0;
+            self.balls[1].velocity = v1;
         }
 
-        self.balls[0].circle.position = self.balls[0].circle.position + self.balls[0].velocity * dt;
-        self.balls[1].circle.position = self.balls[1].circle.position + self.balls[1].velocity * dt;
+        for ball in &mut self.balls {
+            ball.circle.position = ball.circle.position + ball.velocity * dt;
+        }
+
+        // Precise method:
+        // match Ball::collision_time(&self.balls[0], &self.balls[1]) {
+        //     Some(dt1) => {
+        //         if dt1 < dt {
+        //             self.balls[0].circle.position = self.balls[0].circle.position + self.balls[0].velocity * dt1;
+        //             self.balls[1].circle.position = self.balls[1].circle.position + self.balls[1].velocity * dt1;
+        //             let (v0, v1) = Ball::resolve_collision(&self.balls[0], &self.balls[1]);
+        //             self.balls[0].velocity = v0;
+        //             self.balls[1].velocity = v1;
+        //             dt -= dt1;
+        //         }
+        //     },
+        //     None => { }
+        // }
+        //
+        // self.balls[0].circle.position = self.balls[0].circle.position + self.balls[0].velocity * dt;
+        // self.balls[1].circle.position = self.balls[1].circle.position + self.balls[1].velocity * dt;
 
 
         //for ball in &mut self.balls {

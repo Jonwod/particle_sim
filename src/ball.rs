@@ -2,6 +2,7 @@ use sfml::system::Vector2f;
 use sfml::graphics::{RenderWindow, RenderTarget, CircleShape, Color, Transformable, Shape};
 use super::geometry::Circle;
 use super::math;
+use crate::vector_math::{angle_rad, rotate};
 
 
 #[derive(Debug, Copy, Clone)]
@@ -42,16 +43,30 @@ impl Ball {
         self.mass = m;
     }
 
+    pub fn get_position(&self) -> Vector2f {
+        self.circle.position
+    }
+
 
     // Given two balls, presumed to be colliding, returns the post-collision velocities
     // of ball a and ball b respectively
     pub fn resolve_collision(a: & Ball, b: & Ball) -> (Vector2f, Vector2f) {
-        let m_sum = a.get_mass() + b.get_mass();
-        let va =  a.velocity * (a.get_mass() - b.get_mass()) / (m_sum)
-                + b.velocity * (2.0 * b.get_mass()) / (m_sum);
-        let vb = a.velocity * (2.0 * a.get_mass()) / (m_sum)
-               + b.velocity * (a.get_mass() - b.get_mass()) / (a.get_mass() + b.get_mass());
+        // We solve the problem in 2D by simply finding the axis of collision
+        // and then just solving the problem as a 1D collision along that axis.
+        // The velocity components perpendicular to the axis are unaffected.
+        let collision_axis = a.get_position() - b.get_position();
+        let axis_angle = angle_rad(&collision_axis);
+        let ua_loc = rotate(&a.velocity, -axis_angle);
+        let ub_loc = rotate(&b.velocity, -axis_angle);
 
+        let m_sum = a.get_mass() + b.get_mass();
+        let va_loc =  ua_loc.x * (a.get_mass() - b.get_mass()) / (m_sum)
+                          + ub_loc.x * (2.0 * b.get_mass()) / (m_sum);
+        let vb_loc = ua_loc.x * (2.0 * a.get_mass()) / (m_sum)
+                        + ub_loc.x * (a.get_mass() - b.get_mass()) / (a.get_mass() + b.get_mass());
+
+        let va = rotate(&Vector2f{x: va_loc, y: ua_loc.y} , axis_angle);
+        let vb = rotate(&Vector2f{x: vb_loc, y: ub_loc.y}, axis_angle);
         (va, vb)
     }
 
