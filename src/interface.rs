@@ -45,7 +45,9 @@ impl Interface {
 
         self.time_slider.draw(window);
 
-        let collision_message = match Ball::collision_time(&world.get_balls()[0], &world.get_balls()[1]) {
+        let invert_time = self.get_time_factor() < 0.0;
+
+        let collision_message = match Ball::collision_time(&world.get_balls()[0], &world.get_balls()[1], invert_time) {
             Some(dt) => {
                 format!("{:.2}", dt)
             },

@@ -73,7 +73,7 @@ impl Ball {
 
     // Given two balls, returns the time until they will collide
     // Currently only works on the x axis
-    pub fn collision_time(ball1: & Ball, ball2: & Ball) -> Option<f32> {
+    pub fn collision_time(ball1: & Ball, ball2: & Ball, invert_time: bool) -> Option<f32> {
         // We approach this by finding the roots of a quadratic function of dt
         let v1 = ball1.velocity.x;
         let v2 = ball2.velocity.x;
@@ -90,13 +90,24 @@ impl Ball {
                 // as the larger will represent the balls touching but
                 // on the other side.
                 let (min, max) = if dt1 < dt2 {(dt1, dt2)} else {(dt2, dt1)};
-                if min >= 0.0 {
-                    Some(min)
-                } else if max >= 0.0 {
-                    Some(max)
+                if invert_time {
+                    if max <= 0.0 {
+                        Some(max)
+                    } else if min <= 0.0 {
+                        Some(min)
+                    }
+                    else {
+                        None
+                    }
                 }
                 else {
-                    None
+                    if min >= 0.0 {
+                        Some(min)
+                    } else if max >= 0.0 {
+                        Some(max)
+                    } else {
+                        None
+                    }
                 }
             },
             None => None,

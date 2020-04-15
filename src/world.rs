@@ -16,11 +16,11 @@ impl World {
     pub fn new() -> World {
         let mut world = World{ balls: [Ball::default(); 2], floor_level: 500.0};
         world.balls[0].circle.position.x = 200.0;
-        world.balls[0].circle.position.y = 400.0;
+        world.balls[0].circle.position.y = 200.0;
         world.balls[0].velocity.x = 100.0;
         world.balls[0].velocity.y = 0.0;
         world.balls[1].circle.position.x = 400.0;
-        world.balls[1].circle.position.y = 340.0;
+        world.balls[1].circle.position.y = 200.0;
         world.balls[1].velocity.x = 0.0;
         world.balls[1].set_mass(1.0);
         world
