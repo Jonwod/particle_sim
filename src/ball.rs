@@ -66,19 +66,23 @@ impl Ball {
     }
 
 
-    // Given two balls, returns the time until they will collide
-    // Currently only works on the x axis
-    pub fn collision_time(ball1: & Ball, ball2: & Ball, invert_time: bool) -> Option<f32> {
+    // Given two balls, returns the time until they will collide or None if they are not going
+    // to collide in future (in the past if invert_time is set true)
+    pub fn collision_time(ball1: &Ball, ball2: &Ball, invert_time: bool) -> Option<f32> {
         // We approach this by finding the roots of a quadratic function of dt
-        let v1 = ball1.velocity.x;
-        let v2 = ball2.velocity.x;
-        let x1 = ball1.circle.position.x;
-        let x2 = ball2.circle.position.x;
+        let u1 = ball1.velocity;
+        let u2 = ball2.velocity;
+        let i1 = ball1.get_position();  // initial position
+        let i2 = ball2.get_position();  // initial position
         let r1 = ball1.circle.radius;
         let r2 = ball2.circle.radius;
-        let a = v1 * v1 - 2.0 * v1 * v2 + v2 * v2;
-        let b = 2.0 * x1 * v1 - 2.0*x1*v2 - 2.0*x2*v1 + 2.0*x2*v2;
-        let c = x1*x1 - 2.0*x1*x2 + x2*x2 - (r1 + r2).powf(2.0);
+
+        // The coefficients for the quadratic formula:
+        let a = (u1.x - u2.x).powi(2) + (u1.y - u2.y).powi(2);
+        let b = 2.0 * ( (i1.x - i2.x)*(u1.x - u2.x) + (i1.y - i2.y)*(u1.y - u2.y) );
+        let c = -2.0 * (i1.x*i2.x + i1.y*i2.y) + i1.x.powi(2) + i2.x.powi(2) +
+                    i1.y.powi(2) + i2.y.powi(2) - (r1+r2).powi(2);
+
         match math::find_roots(a, b, c) {
             Some((dt1, dt2)) => {
                 // If both are positive then will be the smallest one,
@@ -105,7 +109,7 @@ impl Ball {
                     }
                 }
             },
-            None => None,
+            None => None
         }
     }
 }
