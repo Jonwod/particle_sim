@@ -1,5 +1,4 @@
 use super::ball::Ball;
-use super::geometry::Circle;
 use sfml::system::Vector2f;
 use sfml::graphics::{RenderWindow, RectangleShape, Transformable, Shape, Color, RenderTarget};
 
@@ -32,60 +31,22 @@ impl World {
             ball.velocity.y += G * dt;
         }
 
-        // Test method:
-        if Circle::intersect(&self.balls[0].circle, &self.balls[1].circle) {
-            let (v0, v1) = Ball::resolve_collision(&self.balls[0], &self.balls[1]);
-            self.balls[0].velocity = v0;
-            self.balls[1].velocity = v1;
+        match Ball::collision_time(&self.balls[0], &self.balls[1], dt < 0.0) {
+            Some(dt1) => {
+                if dt1.abs() < dt.abs() {
+                    self.balls[0].circle.position = self.balls[0].circle.position + self.balls[0].velocity * dt1;
+                    self.balls[1].circle.position = self.balls[1].circle.position + self.balls[1].velocity * dt1;
+                    let (v0, v1) = Ball::resolve_collision(&self.balls[0], &self.balls[1]);
+                    self.balls[0].velocity = v0;
+                    self.balls[1].velocity = v1;
+                    dt -= dt1;
+                }
+            },
+            None => { }
         }
 
-        for ball in &mut self.balls {
-            ball.circle.position = ball.circle.position + ball.velocity * dt;
-        }
-
-        // Precise method:
-        // match Ball::collision_time(&self.balls[0], &self.balls[1]) {
-        //     Some(dt1) => {
-        //         if dt1 < dt {
-        //             self.balls[0].circle.position = self.balls[0].circle.position + self.balls[0].velocity * dt1;
-        //             self.balls[1].circle.position = self.balls[1].circle.position + self.balls[1].velocity * dt1;
-        //             let (v0, v1) = Ball::resolve_collision(&self.balls[0], &self.balls[1]);
-        //             self.balls[0].velocity = v0;
-        //             self.balls[1].velocity = v1;
-        //             dt -= dt1;
-        //         }
-        //     },
-        //     None => { }
-        // }
-        //
-        // self.balls[0].circle.position = self.balls[0].circle.position + self.balls[0].velocity * dt;
-        // self.balls[1].circle.position = self.balls[1].circle.position + self.balls[1].velocity * dt;
-
-
-        //for ball in &mut self.balls {
-            //ball.velocity.y += G * dt;
-            // let projected_position = ball.circle.position + ball.velocity * dt;
-            // for other_ball in &self.balls {
-            //     if other_ball as *const int != ball as *const int {
-            //         let projected_circle = Circle{position: projected_position, radius: ball.circle.radius};
-            //         if projected_circle.intersect(&other_ball.circle) {
-            //
-            //         }
-            //     }
-            // }
-
-            // if projected_position.y + ball.circle.radius > self.floor_level {
-            //     let pre_impact_ds = self.floor_level - (projected_position.y + ball.circle.radius);
-            //     let pre_impact_dt = pre_impact_ds / ball.velocity.y;
-            //     let post_impact_dt = dt - pre_impact_dt;
-            //     ball.velocity.y = -ball.velocity.y;     // Perfectly elastic collision
-            //     ball.circle.position.y += pre_impact_ds + ball.velocity.y * post_impact_dt;
-            //     ball.circle.position.x += ball.velocity.x * dt;
-            // }
-            // else {
-            //     ball.circle.position = projected_position;
-            // }
-        //}
+        self.balls[0].circle.position = self.balls[0].circle.position + self.balls[0].velocity * dt;
+        self.balls[1].circle.position = self.balls[1].circle.position + self.balls[1].velocity * dt;
     }
 
 
