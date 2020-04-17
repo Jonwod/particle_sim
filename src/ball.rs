@@ -15,12 +15,7 @@ pub struct Ball {
 
 impl Ball {
     pub fn draw(&self, window: &mut RenderWindow) {
-        let mut temp_circle = match CircleShape::new() {
-            Some(circle) => {
-                circle
-            },
-            None => panic!("Error, cannot create CircleShape")
-        };
+        let mut temp_circle = CircleShape::new().expect("Error, failed to create CircleShape");
 
         temp_circle.set_radius(self.circle.radius);
         temp_circle.set_fill_color(&Color::red());
