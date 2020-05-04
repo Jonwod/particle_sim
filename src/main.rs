@@ -8,6 +8,7 @@ mod vector_math;
 mod interface;
 mod slider;
 mod math;
+mod plane;
 
 use sfml::window::{ContextSettings, VideoMode, event, window_style};
 use sfml::graphics::{RenderWindow, RenderTarget, Color};
@@ -17,7 +18,7 @@ use interface::Interface;
 
 fn main() {
     // Create the window of the application
-    let mut window = RenderWindow::new(VideoMode::new_init(800, 600, 32),
+    let mut window = RenderWindow::new(VideoMode::new_init(1000, 1000, 32),
                                              "SFML Example", window_style::CLOSE,
                                              &ContextSettings::default()).expect("failed to create window");
 

@@ -2,7 +2,8 @@ use sfml::system::Vector2f;
 use sfml::graphics::{RenderWindow, RenderTarget, CircleShape, Color, Transformable, Shape};
 use super::geometry::Circle;
 use super::math;
-use crate::vector_math::{angle_rad, rotate};
+use crate::vector_math::{angle_rad, rotate, dot_product};
+use super::plane::Plane;
 
 
 #[derive(Debug, Copy, Clone)]
@@ -40,6 +41,16 @@ impl Ball {
 
     pub fn get_position(&self) -> Vector2f {
         self.circle.position
+    }
+
+    pub fn set_position(&mut self, x: f32, y: f32) {
+        self.circle.position.x = x;
+        self.circle.position.y = y;
+    }
+
+
+    pub fn displace(&mut self, offset: &Vector2f) {
+        self.circle.position = self.circle.position + *offset;
     }
 
 
@@ -110,6 +121,36 @@ impl Ball {
                 }
             },
             None => None
+        }
+    }
+
+
+    pub fn resolve_plane_collision(&mut self, plane: &Plane) {
+        // v projected onto the plane normal
+        let v = dot_product(&plane.normal, &self.velocity);
+        self.velocity = self.velocity - plane.normal * 2.0 * v;
+    }
+
+
+    pub fn plane_collision_time(&self, plane: &Plane, invert_time: bool) -> Option<f32> {
+        let v = dot_product(&plane.normal, &self.velocity);
+        if v == 0.0 {
+            return None;
+        }
+
+        let initial_pos = dot_product(&plane.normal, &(self.get_position() - plane.position));
+        // the position, in plane-space, at which the ball is touching the plane
+        let final_pos = self.circle.radius;
+        // The displacement from the ball's current position at which it hits the plane
+        let s = final_pos - initial_pos;
+
+        let t = s / v;
+
+        if t >= 0.0 {
+            if invert_time {None} else {Some(t)}
+        }
+        else {
+            if invert_time {Some(t)} else {None}
         }
     }
 }

@@ -16,3 +16,8 @@ pub fn rotate(vec: &Vector2f, angle_rad: f32) -> Vector2f {
     let c = f32::cos(angle_rad);
     Vector2f{x: vec.x * c - vec.y *s, y: vec.x*s + vec.y * c}
 }
+
+
+pub fn dot_product(a: &Vector2f, b: &Vector2f) -> f32 {
+    a.x * b.x  + a.y * b.y
+}

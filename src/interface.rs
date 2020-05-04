@@ -23,7 +23,7 @@ impl Interface {
                 Vector2f{x: 200.0, y: 5.0},
                 Vector2f{x: 0.0, y: 90.0},
                 Vector2f{x: 20.0, y: 10.0},
-                1.0,
+                0.5,
                 -1.0,
                 1.0,
                 Font::new_from_file("data/Ubuntu-R.ttf").expect("failed to load font")
