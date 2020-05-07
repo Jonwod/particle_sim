@@ -5,7 +5,7 @@ use super::plane::Plane;
 
 const G: f32 = 0.0;
 
-const NUM_BALLS: usize = 2;
+const NUM_BALLS: usize = 4;
 
 
 pub struct World {
@@ -14,7 +14,7 @@ pub struct World {
 }
 
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 enum CollisionKind {
     Wall,
     Ball,
@@ -25,6 +25,15 @@ enum CollisionKind {
 struct Collision {
     kind: CollisionKind,
     time: f32,
+    collider_index: usize,
+}
+
+
+// Simply stores both of the colliding objects rather than just one
+#[derive(Copy, Clone, Debug)]
+struct CollisionPair {
+    kind: CollisionKind,
+    ball_index: usize,
     collider_index: usize,
 }
 
@@ -76,9 +85,9 @@ impl World {
         world.balls[1].circle.position.y = 400.0;
         world.balls[1].velocity.x = -3000.0;
         world.balls[1].set_mass(1.0);
-        //
-        // world.balls[2].set_position(500.0, 500.0);
-        // world.balls[3].set_position(600.0, 600.0);
+
+        world.balls[2].set_position(500.0, 500.0);
+        world.balls[3].set_position(600.0, 600.0);
 
         world
     }
@@ -92,13 +101,24 @@ impl World {
 
         let walls = self.get_wall_planes();
 
+        // This is used to store the previously resolved collision in the following loop.
+        // This is to avoid a collision being detected between 2 objects that had their collision
+        // resolved in the previous iteration.
+        let mut last_collision: Option<CollisionPair> = None;
+
         while dt != 0.0 {
             let mut collisions: [Option<Collision>; NUM_BALLS] = [None; NUM_BALLS];
 
             for i in 0..self.balls.len() {
                 for j in (i + 1)..self.balls.len() {
                     if let Some(t) = Ball::collision_time(&self.balls[i], &self.balls[j], dt < 0.0) {
-                        if t != 0.0  &&  t.abs() <= dt.abs() {
+                        // If true then this collision was already resolved in the previous iteration and should not be registered again
+                        let fallthrough = match last_collision {
+                            Some(col) => col.kind == CollisionKind::Ball  &&  col.ball_index == i  &&  col.collider_index == j,
+                            None => false
+                        };
+
+                        if !fallthrough  &&  t != 0.0  &&  t.abs() <= dt.abs() {
                             replace_if_sooner(&mut collisions[i], &Collision { kind: CollisionKind::Ball, time: t, collider_index: j});
                             replace_if_sooner(&mut collisions[j], &Collision { kind: CollisionKind::Ball, time: t, collider_index: i});
                         }
@@ -107,7 +127,13 @@ impl World {
 
                 for j in 0..walls.len()  {
                     if let Some(t) = self.balls[i].plane_collision_time(&walls[j], dt < 0.0) {
-                        if t != 0.0  &&  t.abs() <= dt.abs() {
+                        // If true then this collision was already resolved in the previous iteration and should not be registered again
+                        let fallthrough = match last_collision {
+                            Some(col) => col.kind == CollisionKind::Wall  &&  col.ball_index == i  &&  col.collider_index == j,
+                            None => false
+                        };
+
+                        if !fallthrough  &&  t != 0.0  &&  t.abs() <= dt.abs() {
                             replace_if_sooner(&mut collisions[i], &Collision { kind: CollisionKind::Wall, time: t, collider_index: j});
                         }
                     }
@@ -132,6 +158,7 @@ impl World {
                     }
                 }
                 dt -= soonest_col.time;
+                last_collision = Some(CollisionPair{kind: soonest_col.kind, ball_index: a, collider_index: b});
             } else {
                 // This means there are no further collisions to resolve for the remaining dt
                 break;

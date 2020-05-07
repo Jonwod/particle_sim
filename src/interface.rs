@@ -45,17 +45,17 @@ impl Interface {
 
         self.time_slider.draw(window);
 
-        let invert_time = self.get_time_factor() < 0.0;
+        // let invert_time = self.get_time_factor() < 0.0;
 
-        let collision_message = match Ball::collision_time(&world.get_balls()[0], &world.get_balls()[1], invert_time) {
-            Some(dt) => format!("{:.2}", dt),
-            None => String::from("never")
-        };
-
-
-        t.set_string(&format!("time to collision: {}", collision_message));
-        t.set_position(&Vector2f{x: 0.0, y: 400.0});
-        window.draw(&t);
+        // let collision_message = match Ball::collision_time(&world.get_balls()[0], &world.get_balls()[1], invert_time) {
+        //     Some(dt) => format!("{:.2}", dt),
+        //     None => String::from("never")
+        // };
+        //
+        //
+        // t.set_string(&format!("time to collision: {}", collision_message));
+        // t.set_position(&Vector2f{x: 0.0, y: 400.0});
+        // window.draw(&t);
     }
 
 
