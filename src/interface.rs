@@ -2,7 +2,6 @@ use sfml::graphics::{RenderWindow, RenderTarget, Text, Font, Transformable};
 use super::world::World;
 use sfml::system::Vector2f;
 use super::slider::Slider;
-use super::ball::Ball;
 
 pub struct Interface {
     font: Font,

@@ -26,7 +26,7 @@ impl Ball {
     }
 
     pub fn default() -> Ball {
-        Ball{circle: Circle{position: Vector2f{x: 0., y: 0.}, radius: 32.0},
+        Ball{circle: Circle{position: Vector2f{x: 0., y: 0.}, radius: 16.0},
              velocity: Vector2f{x: 0., y: 0.}, mass: 1.0}
     }
 

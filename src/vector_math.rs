@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use sfml::system::Vector2f;
 
 

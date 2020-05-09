@@ -5,7 +5,7 @@ use super::plane::Plane;
 
 const G: f32 = 0.0;
 
-const NUM_BALLS: usize = 4;
+const NUM_BALLS: usize = 30;
 
 
 pub struct World {
@@ -77,17 +77,15 @@ impl World {
         let mut world = World{ balls: [Ball::default(); NUM_BALLS],
             walls: FloatRect{left: 10.0, top: 150.0, width: 800.0,  height: 800.0}};
 
-        world.balls[0].circle.position.x = 200.0;
-        world.balls[0].circle.position.y = 300.0;
-        world.balls[0].velocity.x = 2300.0;
-        world.balls[0].velocity.y = 500.0;
-        world.balls[1].circle.position.x = 400.0;
-        world.balls[1].circle.position.y = 400.0;
-        world.balls[1].velocity.x = -3000.0;
-        world.balls[1].set_mass(1.0);
-
-        world.balls[2].set_position(500.0, 500.0);
-        world.balls[3].set_position(600.0, 600.0);
+        let offset = Ball::default().circle.radius * 3.0;
+        let origin = Vector2f{x: world.walls.left + offset, y: world.walls.top + offset};
+        let sides = (world.balls.len() as f32).sqrt().ceil() as usize;
+        let spacing = (world.walls.width - 2.0 * offset) / sides as f32;
+        for i in 0..NUM_BALLS {
+            let x = (i % sides) as f32 * spacing;
+            let y = (i / sides) as f32 * spacing;
+            world.balls[i].circle.position = Vector2f{x, y} + origin;
+        }
 
         world
     }
