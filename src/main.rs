@@ -1,5 +1,6 @@
 extern crate sfml;
 extern crate num;
+extern crate rand;
 
 mod ball;
 mod world;

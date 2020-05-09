@@ -2,10 +2,12 @@ use super::ball::Ball;
 use sfml::system::Vector2f;
 use sfml::graphics::{RenderWindow, RectangleShape, Transformable, Shape, Color, RenderTarget, FloatRect};
 use super::plane::Plane;
+use rand::Rng;
+use super::vector_math;
 
 const G: f32 = 0.0;
 
-const NUM_BALLS: usize = 30;
+const NUM_BALLS: usize = 32;
 
 
 pub struct World {
@@ -85,6 +87,14 @@ impl World {
             let x = (i % sides) as f32 * spacing;
             let y = (i / sides) as f32 * spacing;
             world.balls[i].circle.position = Vector2f{x, y} + origin;
+        }
+
+        let mut rng = rand::thread_rng();
+        let max_vel = 2000.0;
+        for ball in &mut world.balls {
+            let intensity = rng.gen_range(0.0, max_vel);
+            let angle = rng.gen_range(0.0, 2.0 * std::f32::consts::PI);
+            ball.velocity = vector_math::rotate(&Vector2f{x: intensity, y: 0.0}, angle);
         }
 
         world
