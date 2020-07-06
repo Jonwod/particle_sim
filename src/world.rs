@@ -134,7 +134,7 @@ impl World {
                     soonest_collisions.clear();
                     soonest_collisions.push(*new_collision);
                 }
-                else if new_collision.time == soonest_collisions[0].time.abs() {
+                else if new_collision.time == soonest_collisions[0].time {
                     soonest_collisions.push(*new_collision);
                 }
             }
@@ -156,6 +156,10 @@ impl World {
                     add_collision_perhaps(&Collision{kind: CollisionKind::Wall, time: t, ball_index: i, collider_index: j});
                 }
             }
+        }
+
+        if soonest_collisions.len() > 1 {
+            println!("soonest_collisions.len(): {}", soonest_collisions.len());
         }
 
         soonest_collisions
