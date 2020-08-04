@@ -1,5 +1,6 @@
 #![allow(dead_code)]
-use sfml::system::Vector2f;
+use sfml::system::{Vector2f};
+use sfml::system::Vector2;
 use sfml::graphics::{RenderWindow, RenderTarget, CircleShape, Color, Transformable, Shape};
 use super::geometry::Circle;
 use super::math;
@@ -17,12 +18,11 @@ pub struct Ball {
 
 impl Ball {
     pub fn draw(&self, window: &mut RenderWindow) {
-        let mut temp_circle = CircleShape::new().expect("Error, failed to create CircleShape");
+        let mut temp_circle = CircleShape::new(self.circle.radius, 32);
 
-        temp_circle.set_radius(self.circle.radius);
-        temp_circle.set_fill_color(&Color::red());
-        temp_circle.set_position(&self.circle.position);
-        temp_circle.set_origin(&Vector2f{x: temp_circle.get_radius(), y: temp_circle.get_radius()});
+        temp_circle.set_fill_color(&Color::RED);
+        temp_circle.set_position(self.circle.position);
+        temp_circle.set_origin(Vector2f{x: temp_circle.radius(), y: temp_circle.radius()});
         window.draw(&temp_circle);
     }
 

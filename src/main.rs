@@ -11,17 +11,17 @@ mod slider;
 mod math;
 mod plane;
 
-use sfml::window::{ContextSettings, VideoMode, event, window_style};
+use sfml::window::{ContextSettings, Event, Style};
 use sfml::graphics::{RenderWindow, RenderTarget, Color};
 use world::World;
 use interface::Interface;
 
 
 fn main() {
-    // Create the window of the application
-    let mut window = RenderWindow::new(VideoMode::new_init(1000, 1000, 32),
-                                             "SFML Example", window_style::CLOSE,
-                                             &ContextSettings::default()).expect("failed to create window");
+        // Create the window of the application
+    let mut window = RenderWindow::new((1000, 1000),
+                                             "SFML Example", Style::CLOSE,
+                                             &ContextSettings::default());
 
     let dt = 1. / 60.;
     window.set_framerate_limit(60);
@@ -31,18 +31,18 @@ fn main() {
 
     while window.is_open() {
         // Handle events
-        for event in window.events() {
+        while let Some(event) = window.poll_event() {
             match event {
-                event::Closed => window.close(),
-                event::MouseButtonPressed{button: _, x, y}  => interface.notify_mouse_down(x, y),
-                event::MouseButtonReleased{button: _, x, y} => interface.notify_mouse_up(x, y),
-                event::MouseMoved{x, y}                     => interface.notify_mouse_moved(x, y),
+                Event::Closed => window.close(),
+                Event::MouseButtonPressed{button: _, x, y}  => interface.notify_mouse_down(x, y),
+                Event::MouseButtonReleased{button: _, x, y} => interface.notify_mouse_up(x, y),
+                Event::MouseMoved{x, y}                     => interface.notify_mouse_moved(x, y),
                 _             => {/* do nothing */}
             }
         }
 
         // Clear the window
-        window.clear(&Color::new_rgb(0, 200, 200));
+        window.clear(&Color::rgb(0, 200, 200));
         world.draw(&mut window);
         interface.draw(&mut window, &world);
 

@@ -28,23 +28,19 @@ impl Slider {
 
 
     pub fn draw(&self, window: &mut RenderWindow) {
-        let mut line = RectangleShape::new_init(&Vector2f{x: self.size.x, y: 5.0}).expect("failed to create RectangleShape");
-        line.set_position(&self.position);
-        line.set_fill_color(&Color::black());
+        let mut line = RectangleShape::with_size(Vector2f{x: self.size.x, y: 5.0});
+        line.set_position(self.position);
+        line.set_fill_color(&Color::BLACK);
         window.draw(&line);
 
-        let mut handle = RectangleShape::new_init(&self.handle_size).expect("failed to create RectangleShape");
-        handle.set_origin(& (self.handle_size / 2.0) );
-        handle.set_position(&self.handle_origin());
-        handle.set_fill_color(&Color::new_rgb(125, 125, 125));
+        let mut handle = RectangleShape::with_size(self.handle_size);
+        handle.set_origin(self.handle_size / 2.0);
+        handle.set_position(self.handle_origin());
+        handle.set_fill_color(&Color::rgb(125, 125, 125));
         window.draw(&handle);
 
-        let mut text = Text::new().expect("failed to create text");
-        text.set_font(&self.font);
-        text.set_string(&format!("{:.2}", self.get_value()));
-        //text.set_position(& (self.position + Vector2f{x: self.size.x + 2.0, y: 0.0}) );
-        text.set_position(&self.handle_origin());
-        text.set_character_size(12);
+        let mut text = Text::new(&format!("{:.2}", self.get_value()), &self.font, 12);
+        text.set_position(self.handle_origin());
         window.draw(&text);
     }
 

@@ -63,7 +63,7 @@ impl World {
 
     pub fn update(&mut self, mut dt: f32) {
         // A fully robust collision policy requires finding the soonest collision(s), advancing time to
-        // the point of collision(s), resolving the collisions and then repeating the process with re-computed collisions
+        // the point of collision(s), resolving the collisions and then repeating the process with re-computed velocities
 
         while dt != 0.0 {
             let soonest_collisions = self.get_soonest_collisions(dt < 0.0);
@@ -91,7 +91,7 @@ impl World {
     fn resolve_collisions(&mut self, collisions: &Vec<Collision>) -> f32 {
         if collisions.len() == 0 { return 0.0; }
 
-        let t = collisions[0].time;
+        let t = collisions[0].time; // - collisions[0].time.signum() * 0.00001;
 
         // Advance the simulation to the point of the collision
         for ball in &mut self.balls {
@@ -114,6 +114,10 @@ impl World {
                 let (va, vb) = Ball::resolve_collision(&self.balls[a], &self.balls[b]);
                 self.balls[a].velocity = va;
                 self.balls[b].velocity = vb;
+
+                if let Some(t) = Ball::collision_time(&self.balls[a], &self.balls[b], false) {
+                    println!("Having just resolved collision, balls are set to collide at time {}", t);
+                };
             },
             CollisionKind::Wall => {
                 self.balls[a].resolve_plane_collision(&self.walls[b]);
@@ -179,21 +183,21 @@ impl World {
     fn draw_walls(&self, window: &mut RenderWindow) {
         let thickness = 10.0;
         let rect = self.bounding_rect();
-        let mut shape = RectangleShape::new_init(&Vector2f{ x: rect.width, y: thickness}).expect("failed to create RectangleShape");
-        shape.set_fill_color(&Color::new_rgb(125, 125, 125));
+        let mut shape = RectangleShape::with_size(Vector2f{ x: rect.width, y: thickness});
+        shape.set_fill_color(&Color::rgb(125, 125, 125));
 
-        shape.set_position2f(rect.left, rect.top + rect.height);
+        shape.set_position(Vector2f{x: rect.left, y: rect.top + rect.height});
         window.draw(&shape);
 
-        shape.set_position(&Vector2f{x: rect.left, y: rect.top - thickness});
+        shape.set_position(Vector2f{x: rect.left, y: rect.top - thickness});
         window.draw(&shape);
 
-        shape.set_size2f(thickness, rect.height);
+        shape.set_size(Vector2f{x: thickness, y: rect.height});
 
-        shape.set_position2f(rect.left + rect.width, rect.top);
+        shape.set_position(Vector2f{x: rect.left + rect.width, y: rect.top});
         window.draw(&shape);
 
-        shape.set_position2f(rect.left - thickness, rect.top);
+        shape.set_position(Vector2f{x: rect.left - thickness, y: rect.top});
         window.draw(&shape);
     }
 

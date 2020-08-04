@@ -17,7 +17,7 @@ impl Interface {
 
     pub fn new() -> Interface {
         Interface{
-            font: Font::new_from_file("data/Ubuntu-R.ttf").expect("failed to load font"),
+            font: Font::from_file("data/Ubuntu-R.ttf").expect("failed to load font"),
             time_slider: Slider::new(
                 Vector2f{x: 200.0, y: 5.0},
                 Vector2f{x: 0.0, y: 90.0},
@@ -25,20 +25,19 @@ impl Interface {
                 0.5,
                 -1.0,
                 1.0,
-                Font::new_from_file("data/Ubuntu-R.ttf").expect("failed to load font")
+                Font::from_file("data/Ubuntu-R.ttf").expect("failed to load font")
             )
         }
     }
 
 
     pub fn draw(&self, window: &mut RenderWindow, world: &World) {
-        let mut t = Text::new().expect("failed to create text");
-        t.set_font(&self.font);
-        t.set_string(&format!("v1: {}", Interface::vec_to_string(&world.get_balls()[0].velocity)));
+        let mut t = Text::new(&format!("v1: {}", Interface::vec_to_string(&world.get_balls()[0].velocity)),
+                              &self.font, 32);
         window.draw(&t);
 
         t.set_string(&format!("v2: {}", Interface::vec_to_string(&world.get_balls()[1].velocity)));
-        t.set_position(&Vector2f{x: 0.0, y: 40.0});
+        t.set_position(Vector2f{x: 0.0, y: 40.0});
         window.draw(&t);
 
 
