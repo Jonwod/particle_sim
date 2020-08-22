@@ -86,12 +86,13 @@ impl World {
     }
 
 
+
     // Resolves the specified collisions, which should be concurrent. Advances simulation to
     // the time of collision. Returns the elapsed time.
     fn resolve_collisions(&mut self, collisions: &Vec<Collision>) -> f32 {
         if collisions.len() == 0 { return 0.0; }
 
-        let t = collisions[0].time; // - collisions[0].time.signum() * 0.00001;
+        let t = collisions[0].time;
 
         // Advance the simulation to the point of the collision
         for ball in &mut self.balls {
@@ -114,10 +115,6 @@ impl World {
                 let (va, vb) = Ball::resolve_collision(&self.balls[a], &self.balls[b]);
                 self.balls[a].velocity = va;
                 self.balls[b].velocity = vb;
-
-                if let Some(t) = Ball::collision_time(&self.balls[a], &self.balls[b], false) {
-                    println!("Having just resolved collision, balls are set to collide at time {}", t);
-                };
             },
             CollisionKind::Wall => {
                 self.balls[a].resolve_plane_collision(&self.walls[b]);

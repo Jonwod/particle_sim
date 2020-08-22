@@ -1,9 +1,9 @@
 #![allow(dead_code)]
 use sfml::system::{Vector2f};
-use sfml::system::Vector2;
 use sfml::graphics::{RenderWindow, RenderTarget, CircleShape, Color, Transformable, Shape};
 use super::geometry::Circle;
 use super::math;
+use super::math::convert_vector2;
 use crate::vector_math::{angle_rad, rotate, dot_product};
 use super::plane::Plane;
 
@@ -55,6 +55,11 @@ impl Ball {
     }
 
 
+    pub fn intersects(&self, other: &Ball) -> bool {
+        self.circle.intersect(&other.circle)
+    }
+
+
     // Given two balls, presumed to be colliding, returns the post-collision velocities
     // of ball a and ball b respectively
     pub fn resolve_collision(a: & Ball, b: & Ball) -> (Vector2f, Vector2f) {
@@ -81,13 +86,19 @@ impl Ball {
     // Given two balls, returns the time until they will collide or None if they are not going
     // to collide in future (in the past if invert_time is set true)
     pub fn collision_time(ball1: &Ball, ball2: &Ball, invert_time: bool) -> Option<f32> {
+        // If the balls are intersecting, we consider them as not going to collide.
+        // Insert the reason here when less fucking tired.
+        if ball1.intersects(ball2) {
+            return None;
+        }
+
         // We approach this by finding the roots of a quadratic function of dt
-        let u1 = ball1.velocity;
-        let u2 = ball2.velocity;
-        let i1 = ball1.get_position();  // initial position
-        let i2 = ball2.get_position();  // initial position
-        let r1 = ball1.circle.radius;
-        let r2 = ball2.circle.radius;
+        let u1 = convert_vector2::<f32, f64>(ball1.velocity);
+        let u2 = convert_vector2::<f32, f64>(ball2.velocity);
+        let i1 = convert_vector2::<f32, f64>(ball1.get_position());  // initial position
+        let i2 = convert_vector2::<f32, f64>(ball2.get_position());  // initial position
+        let r1 = ball1.circle.radius as f64;
+        let r2 = ball2.circle.radius as f64;
 
         // The coefficients for the quadratic formula:
         let a = (u1.x - u2.x).powi(2) + (u1.y - u2.y).powi(2);
@@ -95,7 +106,7 @@ impl Ball {
         let c = -2.0 * (i1.x*i2.x + i1.y*i2.y) + i1.x.powi(2) + i2.x.powi(2) +
                     i1.y.powi(2) + i2.y.powi(2) - (r1+r2).powi(2);
 
-        match math::find_roots(a, b, c) {
+        let result = match math::find_roots(a, b, c) {
             Some((dt1, dt2)) => {
                 // If both are positive then will be the smallest one,
                 // as the larger will represent the balls touching but
@@ -122,6 +133,15 @@ impl Ball {
                 }
             },
             None => None
+        };
+
+        match result {
+            Some(t) => {
+                Some(t as f32)
+            },
+            None => {
+                None
+            }
         }
     }
 
