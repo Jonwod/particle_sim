@@ -6,11 +6,10 @@ use rand::Rng;
 use super::vector_math;
 
 
-const NUM_BALLS: usize = 32;
 
 
 pub struct World {
-    balls: [Ball; NUM_BALLS],
+    balls: Vec<Ball>,
     walls: [Plane; 4],
 }
 
@@ -35,14 +34,14 @@ impl World {
     pub fn new() -> World {
         let walls_rect = FloatRect{left: 10.0, top: 150.0, width: 800.0,  height: 800.0};
 
-        let mut world = World{ balls: [Ball::default(); NUM_BALLS],
+        let mut world = World{ balls: vec![Ball::default(); 120],
             walls: World::rect_to_planes(&walls_rect)};
 
         let offset = Ball::default().circle.radius * 3.0;
         let origin = Vector2f{x: walls_rect.left + offset, y: walls_rect.top + offset};
         let sides = (world.balls.len() as f32).sqrt().ceil() as usize;
         let spacing = (walls_rect.width - 2.0 * offset) / sides as f32;
-        for i in 0..NUM_BALLS {
+        for i in 0..world.balls.len() {
             let x = (i % sides) as f32 * spacing;
             let y = (i / sides) as f32 * spacing;
             world.balls[i].circle.position = Vector2f{x, y} + origin;
@@ -199,7 +198,7 @@ impl World {
     }
 
 
-    pub fn get_balls(&self) -> &[Ball; NUM_BALLS] {
+    pub fn get_balls(&self) -> &Vec<Ball>{
         &self.balls
     }
 
